@@ -145,10 +145,10 @@
       (if-let [id (first queue)]
         (cond
           (contains? visited id)
-          (recur visited not-found failed (rest queue))
+          (recur visited not-found failed (vec (rest queue)))
 
           (not (id->xf id))
-          (recur visited (conj not-found id) failed (rest queue))
+          (recur visited (conj not-found id) failed (vec (rest queue)))
 
           :else
           (let [transform        (id->xf id)
@@ -162,7 +162,7 @@
             (recur (assoc visited id resolved-ids)
                    not-found
                    (cond-> failed fail? (conj id))
-                   (into (rest queue) resolved-ids))))
+                   (into (vec (rest queue)) resolved-ids))))
         {:dependencies visited
          :not-found    not-found
          :failed       failed}))))
