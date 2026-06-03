@@ -69,11 +69,13 @@ describe("MetricPill action menu", () => {
 
     expect(screen.getByText("Replace")).toBeInTheDocument();
     expect(screen.getByText("Go to metric home page")).toBeInTheDocument();
+    expect(screen.getByLabelText("home icon")).toBeInTheDocument();
+    expect(screen.queryByLabelText("external icon")).not.toBeInTheDocument();
     // No separator when there are no breakout items between them.
     expect(screen.queryByRole("separator")).not.toBeInTheDocument();
   });
 
-  it("should show 'Replace', 'Break out', and 'Go to metric home page' with a separator when dimensions exist", async () => {
+  it("should show 'Replace', 'Break out', and 'Go to metric home page' without a separator when dimensions exist", async () => {
     const metadata = createMetricMetadata([REVENUE_METRIC]);
     const definition = setupDefinition(metadata, REVENUE_METRIC.id);
 
@@ -86,8 +88,7 @@ describe("MetricPill action menu", () => {
     expect(screen.getByText("Replace")).toBeInTheDocument();
     expect(screen.getByText("Break out")).toBeInTheDocument();
     expect(screen.getByText("Go to metric home page")).toBeInTheDocument();
-    // One separator between breakout items and 'Go to metric home page'.
-    expect(screen.getAllByRole("separator")).toHaveLength(1);
+    expect(screen.queryByRole("separator")).not.toBeInTheDocument();
   });
 
   it("should open the MetricSearchDropdown when Replace is clicked", async () => {
