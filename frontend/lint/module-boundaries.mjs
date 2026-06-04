@@ -48,7 +48,7 @@ const elements = [
   createElement({ type: "basic", name: "ui" }),
 
   // shared
-  createElement({ type: "shared", name: "account" }),
+  createElement({ type: "feature", name: "account" }),
   createElement({ type: "shared", name: "api" }),
   createElement({ type: "shared", name: "archive" }),
   createElement({ type: "shared", name: "auth" }),
