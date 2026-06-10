@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { t } from "ttag";
 
 import {
@@ -6,7 +6,7 @@ import {
   QueryColumnInfoIcon,
 } from "metabase/common/components/MetadataInfo/QueryColumnInfoIcon";
 import { useTranslateContent } from "metabase/content-translation/hooks";
-import { Checkbox, DelayGroup } from "metabase/ui";
+import { Checkbox, DelayGroup, Icon, TextInput } from "metabase/ui";
 import * as Lib from "metabase-lib";
 
 import S from "./FieldPicker.module.css";
@@ -46,6 +46,8 @@ export const FieldPicker = ({
   ...props
 }: FieldPickerProps) => {
   const tc = useTranslateContent();
+  const [searchText, setSearchText] = useState("");
+
   const items = useMemo(() => {
     const items = columns.map((column) => ({
       column,
@@ -57,6 +59,14 @@ export const FieldPicker = ({
       isDisabled: isColumnDisabled?.(item, items),
     }));
   }, [query, stageIndex, columns, isColumnSelected, isColumnDisabled]);
+
+  const visibleItems = searchText
+    ? items.filter((item) =>
+        item.columnInfo.displayName
+          .toLowerCase()
+          .includes(searchText.toLowerCase()),
+      )
+    : items;
 
   const isAll = items.every((item) => item.isSelected);
   const isNone = items.every((item) => !item.isSelected);
@@ -70,20 +80,28 @@ export const FieldPicker = ({
   };
 
   return (
-    <ul className={S.ItemList} data-testid={props["data-testid"]}>
-      <li className={S.ToggleItem}>
-        <HoverParent as="label" className={S.Label}>
-          <Checkbox
-            variant="stacked"
-            checked={isAll}
-            indeterminate={!isAll && !isNone}
-            onChange={handleLabelToggle}
-          />
-          <div className={S.ItemTitle}>{t`Select all`}</div>
-        </HoverParent>
-      </li>
-      <DelayGroup>
-        {items.map((item) => (
+    <div>
+      <TextInput
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        rightSection={<Icon name="search" />}
+        placeholder={t`Search for a column…`}
+        mb="sm"
+      />
+      <ul className={S.ItemList} data-testid={props["data-testid"]}>
+        <li className={S.ToggleItem}>
+          <HoverParent as="label" className={S.Label}>
+            <Checkbox
+              variant="stacked"
+              checked={isAll}
+              indeterminate={!isAll && !isNone}
+              onChange={handleLabelToggle}
+            />
+            <div className={S.ItemTitle}>{t`Select all`}</div>
+          </HoverParent>
+        </li>
+        <DelayGroup>
+          {visibleItems.map((item) => (
           <li key={item.columnInfo.longDisplayName}>
             <HoverParent className={S.Label} as="label">
               <Checkbox
@@ -107,7 +125,8 @@ export const FieldPicker = ({
             </HoverParent>
           </li>
         ))}
-      </DelayGroup>
-    </ul>
+        </DelayGroup>
+      </ul>
+    </div>
   );
 };
