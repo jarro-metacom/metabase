@@ -17,6 +17,12 @@ jobs:
     steps:
       - name: Check out the code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get version from nearest tag
+        id: version
+        run: echo "value=$(git describe --tags --abbrev=0)-custom" >> $GITHUB_OUTPUT
 
       - name: Log in to GHCR
         uses: docker/login-action@v3
@@ -34,6 +40,6 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/jarro-metacom/metabase:latest
-          build-args: VERSION=v0.61.3-custom
+          build-args: VERSION=${{ steps.version.outputs.value }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
